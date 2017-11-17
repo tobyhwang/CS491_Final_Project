@@ -1,5 +1,9 @@
 .App {
-  text-align: center;
+  text-align: left;
+}
+
+.Ingredient {
+  text-align: left;
 }
 
 .App-logo {
