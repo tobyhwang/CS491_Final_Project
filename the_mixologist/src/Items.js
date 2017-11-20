@@ -1,31 +1,134 @@
 import React, { Component } from 'react';
   
 class Items extends Component {
+
   constructor(props){
   	super(props);
-  	this.inputedItem = "";
-  	this.itemList = [];
-  }
-
-  addInputToList(){
-  	var input = document.getElementById('item_field').value;
-  	var list = document.getElementById('item_list');
-  	var list_element = document.createElement("li");
-  	list_element.appendChild(document.createTextNode(input));
-  	list_element.setAttribute("id", "1");
-  	list.appendChild(list_element);
+  	this.state ={
+        items:['gin', 'whiskey', 'vodka'],
+        message: ''
+    };
 
   }
 
+    addItem(e){
+      e.preventDefault();
+      const {items} = this.state;
+      const newItem = this.newItem.value;
 
-  render() {
+      const existsOnList = items.includes(newItem);
+
+      if(existsOnList){
+
+          this.setState({
+            message: 'Ingredient already entered'
+      });
+
+      } else {
+
+          //prevent empty submission
+          newItem !== '' && this.setState({
+              //previously stored items in the state, then add new item
+              items: [...this.state.items, newItem],
+              message: ''
+          });
+      }
+
+      this.addForm.reset();
+    }
+
+
+    removeItem(item){
+
+        const newItems = this.state.items.filter(newItem =>{
+           return  newItem !== item;
+        });
+
+        this.setState({
+
+           items: [...newItems]
+
+        });
+
+
+        if(newItems.length === 0) {
+            this.setState({
+                message: 'No items are currently added'
+            });
+        }
+
+    }
+
+    clearAll(){
+
+        this.setState({
+            items: [],
+            message: 'No items are currently added'
+        });
+    }
+
+
+render() {
+    const{items, message} = this.state;
     return (
-      /*Ingredient Module: User can add an ingredient to a list*/
-      <div className="App">
-      	<input type="text" id="item_field"></input>
-      	<input id="add_item" onClick={this.addInputToList} type="submit" value="+"></input>
-      	<ul id="item_list"></ul>
+      <div>
+          <header>
+              <h1>Ingredient List</h1>
+          </header>
+
+          <form ref={input => this.addForm = input} className="form-inline" onSubmit={(e) => {this.addItem(e)}}>
+              <div className="form-group">
+                  <label className="sr-only" htmlFor="newItemInput">Add New Item</label>
+                  <input ref={input => this.newItem = input} placeholder="ex. vodka" className="form-control" id="newItemInput"/>
+                  <button type="submit" className="btn btn-primary">+</button>
+              </div>
+
+          </form>
+
+          <div className="App">
+              {
+                  (message !== '' || items.length === 0) && <p className="message text-danger">{message}</p>
+              }
+              {
+                  items.length > 0 &&
+                  <table className = "table">
+                      <caption>Ingredient List</caption>
+                      <thread>
+                          <tr>
+                              <th>#</th>
+                              <th>Item</th>
+                              <th>Action</th>
+                          </tr>
+                      </thread>
+                      <tbody>
+                      {
+                          items.map(item => {
+                              return(
+                                  <tr key = {item}>
+                                      <th scope = "row">{items.indexOf(item) + 1}</th>
+                                      <td>{item}</td>
+                                      <td className="text-right" colSpan="1">
+                                          <button onClick={(e)=> this.removeItem(item)} className="btn btn-default btn-sm">
+                                              Remove
+                                          </button>
+                                      </td>
+                                  </tr>
+                              )
+                          })
+                      }
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                            <td colSpan="1">&nbsp;</td>
+                            <td className="text-right"></td>
+                                <button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</button>
+                        </tr>
+                      </tfoot>
+                  </table>
+              }
+          </div>
       </div>
+
 
     );
   }
