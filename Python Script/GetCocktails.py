@@ -22,7 +22,8 @@ possible_drinks = []
 with open('drinks.txt', 'w') as out:
     for ingredient in possible_ingredients:
         drinks = requests.get('http://www.thecocktaildb.com/api/json/v1/1/filter.php?i=' + ingredient)
-        json.dump(drinks.json()['drinks'], out)
+        json.dump(drinks.json(), out)
+        out.write('\n')
         drinks = drinks.json()['drinks']
         for d in drinks:
             possible_drinks.append((d['idDrink'], d['strDrink']))
@@ -32,11 +33,7 @@ with open('drinks.txt', 'w') as out:
 with open('recipes.txt', 'w') as outfile:
     for drink in possible_drinks:
         recipe_request = requests.get('http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=' + drink[0])
-        json.dump(recipe_request.json()['drinks'], outfile)
-        print(drink)
-        time.sleep(.5)
+        json.dump(recipe_request.json(), outfile)
+        outfile.write('\n')
+        time.sleep(.2)
 
-# # read
-# with open('recipes.txt') as json_data:
-#     d = json.load(json_data)
-#     print(d[0]['idDrink'])
