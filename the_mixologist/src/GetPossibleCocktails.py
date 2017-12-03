@@ -71,7 +71,7 @@ def n_drinks(ingredients, drinks, n):
         for item in v[0:15]:
             if item in ingredients or item == '':
                 matched += 1
-        if 15 - n <= matched:
+        if 15 - n == matched:
             n_eligible[k] = v
 
     return n_eligible
@@ -79,15 +79,18 @@ def n_drinks(ingredients, drinks, n):
 client = create_client('the-mixologist')
 query = client.query(kind='Recipe')
 
-#ingredients = ['Light rum', 'Ginger beer']
-#drinks = elgible_drinks(ingredients, query)
+ingredients = ['Light rum', 'Ginger beer', 'Lemon peel']
+ingredients = [x.lower() for x in ingredients]
+print(ingredients)
+drinks = elgible_drinks(ingredients, query)
 
-#print('exact: ' + str(exact_drinks(ingredients, drinks)))
-#print('n: ' + str(n_drinks(ingredients, drinks, 1)))
+# print('exact: ' + str(exact_drinks(ingredients, drinks)))
+# print('n: ' + str(n_drinks(ingredients, drinks, 1)))
 
 @app.route('/eligible',methods = ["POST"])
 def eligible_endpoint():
     ingredients = request.get_json(force=True)['ingredients']
+    map(lambda x:x.lower(),ingredients)
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     elgible = exact_drinks(ingredients, drinks)
@@ -96,6 +99,7 @@ def eligible_endpoint():
 @app.route('/eligible2',methods = ["POST"])
 def eligible2_endpoint():
     ingredients = request.get_json(force=True)['ingredients']
+    map(lambda x:x.lower(), ingredients)
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     elgible = exact_drinks(ingredients, drinks)
