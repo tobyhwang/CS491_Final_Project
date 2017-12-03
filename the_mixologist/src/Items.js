@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import $ from 'jquery';
   
 class Items extends Component {
 
@@ -37,6 +38,36 @@ class Items extends Component {
       this.addForm.reset();
     }
 
+
+    findRecipe(){
+        // console.log(this.state.items);
+        var itemList = this.state.items.toString();
+        var itemString = itemList.replace(/,/g, "\",\"");
+        var querystring = '{"ingredients":["'  + itemString + '"]}';
+        console.log("QUERY = " + querystring);
+        
+        $.ajax({
+            url: "http://localhost:5000/eligible",
+            type: "POST",
+            // processData: false,
+            data: querystring,
+            // contentType: 'application/json',
+            dataType: "json",
+            async: false,
+            success: function(response) {
+                console.log(JSON.stringify(response));
+            },
+            error: function(response) {
+                console.log("Connection Problem", response);
+            },
+
+            complete: function(response) {
+                console.log("Connection Established", response);
+            }
+        });
+
+        // '{"ingredients": ["Light rum", "Ginger beer", "Lemon peel"]}'
+    }
 
     removeItem(item){
 
@@ -127,6 +158,7 @@ render() {
                   </table>
               }
           </div>
+          <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">TEST BUTTON</button>
       </div>
 
 
