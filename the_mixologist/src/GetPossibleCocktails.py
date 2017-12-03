@@ -1,7 +1,10 @@
 # Imports the Google Cloud client library
 from google.cloud import datastore
 import json
-
+from flask import Flask
+from flask import request
+from flask import jsonify
+app = Flask(__name__)
 
 def create_client(project_id):
     return datastore.Client(project_id)
@@ -74,8 +77,18 @@ def n_drinks(ingredients, drinks, n):
 client = create_client('the-mixologist')
 query = client.query(kind='Recipe')
 
-ingredients = ['Light rum', 'Ginger beer']
-drinks = elgible_drinks(ingredients, query)
+#ingredients = ['Light rum', 'Ginger beer']
+#drinks = elgible_drinks(ingredients, query)
 
-print('exact: ' + str(exact_drinks(ingredients, drinks)))
-print('n: ' + str(n_drinks(ingredients, drinks, 1)))
+#print('exact: ' + str(exact_drinks(ingredients, drinks)))
+#print('n: ' + str(n_drinks(ingredients, drinks, 1)))
+
+@app.route('/eligible',methods = ["POST"])
+def eligible_endpoint():
+    ingredients = request.get_json()['ingredients']
+    drinks = elgible_drinks(ingredients, query)
+    elgible = exact_drinks(ingredients, drinks)
+    return jsonify(elgible)
+
+if __name__ == '__main__':
+    app.run()
