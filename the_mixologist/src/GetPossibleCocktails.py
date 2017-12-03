@@ -4,7 +4,9 @@ import json
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 def create_client(project_id):
     return datastore.Client(project_id)
@@ -85,7 +87,16 @@ query = client.query(kind='Recipe')
 
 @app.route('/eligible',methods = ["POST"])
 def eligible_endpoint():
-    ingredients = request.get_json()['ingredients']
+    ingredients = request.get_json(force=True)['ingredients']
+    print(ingredients)
+    drinks = elgible_drinks(ingredients, query)
+    elgible = exact_drinks(ingredients, drinks)
+    return jsonify(elgible)
+
+@app.route('/eligible2',methods = ["POST"])
+def eligible2_endpoint():
+    ingredients = request.get_json(force=True)['ingredients']
+    print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     elgible = exact_drinks(ingredients, drinks)
     return jsonify(elgible)
