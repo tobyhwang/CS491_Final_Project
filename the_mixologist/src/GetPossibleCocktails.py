@@ -76,34 +76,38 @@ def n_drinks(ingredients, drinks, n):
 
     return n_eligible
 
-client = create_client('the-mixologist')
-query = client.query(kind='Recipe')
 
-ingredients = ['Light rum', 'Ginger beer', 'Lemon peel']
-ingredients = [x.lower() for x in ingredients]
-print(ingredients)
-drinks = elgible_drinks(ingredients, query)
+# ingredients = ['Light rum', 'Ginger beer', 'Lemon peel']
+# ingredients = [x.lower() for x in ingredients]
+# print(ingredients)
+# drinks = elgible_drinks(ingredients, query)
 
 # print('exact: ' + str(exact_drinks(ingredients, drinks)))
 # print('n: ' + str(n_drinks(ingredients, drinks, 1)))
 
-@app.route('/eligible',methods = ["POST"])
+#route returns exact drinks
+@app.route('/exact',methods = ["POST"])
 def eligible_endpoint():
+    client = create_client('the-mixologist')
+    query = client.query(kind='Recipe')
     ingredients = request.get_json(force=True)['ingredients']
-    map(lambda x:x.lower(),ingredients)
+    ingredients = [x.lower() for x in ingredients]
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
-    elgible = exact_drinks(ingredients, drinks)
-    return jsonify(elgible)
+    exact = exact_drinks(ingredients, drinks)
+    return jsonify(exact)
 
-@app.route('/eligible2',methods = ["POST"])
+# route returns n drinks away
+@app.route('/n_away',methods = ["POST"])
 def eligible2_endpoint():
+    client = create_client('the-mixologist')
+    query = client.query(kind='Recipe')
     ingredients = request.get_json(force=True)['ingredients']
-    map(lambda x:x.lower(), ingredients)
+    ingredients = [x.lower() for x in ingredients]
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
-    elgible = exact_drinks(ingredients, drinks)
-    return jsonify(elgible)
+    n = n_drinks(ingredients, drinks)
+    return jsonify(n)
 
 if __name__ == '__main__':
     app.run()
