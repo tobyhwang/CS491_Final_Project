@@ -52,17 +52,13 @@ class Items extends Component {
         var json = $.ajax({
             url: "http://localhost:5000/exact",
             type: "POST",
-            // processData: false,
             data: querystring,
+            // processData: false,
             // contentType: 'application/json',
             dataType: "json",
             async: false,
             success: function(response) {
-                // this.setState({
-                //     recipeJSON: response.data
-                // })
                 return response;
-                // return response;
             },
             error: function(response) {
                 console.log("Connection Problem", response);
@@ -72,6 +68,7 @@ class Items extends Component {
                 console.log("Connection Established", response);
             }
         });
+
         this.setState({
             recipeJSON : json.responseJSON
         })

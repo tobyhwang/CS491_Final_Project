@@ -1,37 +1,38 @@
 import React, { Component } from 'react';
-  
+import $ from 'jquery';
+
 class Drink extends Component {
 
     constructor(props){
         super(props);
         this.state ={
             name: this.props.name,
+            item_1: this.props.item_1,
             json: this.props.json,
             help: ""
         };
-    }
-    loadDrink(){
-        var recipe = this.state.json;
-        // console.log(recipe[this.state.name][0]);
-        // this.state.help = recipe[this.state.name][0];
-        var json = this.state.json;
-        var name = this.state.name;
-        if (json)
-        {
-            console.log("HELLA ASS " + json[name][0]);
-        }
-        else
-        {
-            console.log("FAIL");
-        }
+        this.constructHTML = this.constructHTML.bind(this);
+        this.expandInfo = this.expandInfo.bind(this);
     }
 
+    constructHTML(){
+        return (
+            '<div>' + this.props.name +'</div>'
+        );
+    }
+        
+
+    expandInfo(){
+        var html = this.constructHTML();
+        $('#info').html(html);
+    }
 
 
     render() {
         return(
             <div>
-                <button onClick={this.loadDrink()}>{this.props.name}</button>
+                <button onClick={this.expandInfo}>{this.props.name}</button>
+                <div id="info"></div>
             </div>
         )
     }
