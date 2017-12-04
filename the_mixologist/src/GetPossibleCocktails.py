@@ -15,6 +15,7 @@ def create_client(project_id):
 def elgible_drinks(ingredients, query):
 
     drinks = {}
+    client = create_client('the-mixologist')
 
     # store every drink ina dict that has all those ingredients
     for ingredient in ingredients:

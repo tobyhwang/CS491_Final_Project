@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import Recipes from './Recipes';
   
 class Items extends Component {
 
   constructor(props){
   	super(props);
   	this.state ={
-        items:['gin', 'whiskey', 'vodka'],
-        message: ''
+        items:['Light rum', 'Lemon peel', 'Ginger beer'],
+        message: '',
+        recipeJSON: null
     };
+    // this.findRecipe = this.findRecipe.bind(this);
 
   }
 
@@ -46,8 +49,8 @@ class Items extends Component {
         var querystring = '{"ingredients":["'  + itemString + '"]}';
         console.log("QUERY = " + querystring);
         
-        $.ajax({
-            url: "http://localhost:5000/eligible",
+        var json = $.ajax({
+            url: "http://localhost:5000/exact",
             type: "POST",
             // processData: false,
             data: querystring,
@@ -55,7 +58,11 @@ class Items extends Component {
             dataType: "json",
             async: false,
             success: function(response) {
-                console.log(JSON.stringify(response));
+                // this.setState({
+                //     recipeJSON: response.data
+                // })
+                return response;
+                // return response;
             },
             error: function(response) {
                 console.log("Connection Problem", response);
@@ -65,8 +72,9 @@ class Items extends Component {
                 console.log("Connection Established", response);
             }
         });
-
-        // '{"ingredients": ["Light rum", "Ginger beer", "Lemon peel"]}'
+        this.setState({
+            recipeJSON : json.responseJSON
+        })
     }
 
     removeItem(item){
@@ -158,7 +166,9 @@ render() {
                   </table>
               }
           </div>
-          <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">TEST BUTTON</button>
+          <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">+</button>
+          <Recipes recipeJSON={this.state.recipeJSON}/>
+
       </div>
 
 
