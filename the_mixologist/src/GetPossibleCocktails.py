@@ -77,6 +77,64 @@ def n_drinks(ingredients, drinks, n):
 
     return n_eligible
 
+def setRatings(drink_name,new_rating):
+
+# Instantiates a client
+datastore_client = datastore.Client('the-mixologist')
+
+# The kind for the new entity
+query = datastore_client.query(kind='Recipe')
+
+query.add_filter('name', '=', drink_name)
+result = query.fetch()
+
+
+for res in result:
+
+    # The name/ID for the new entity
+    # name = 'vodka'
+    # The Cloud Datastore key for the new entity
+    task_key = datastore_client.key('Recipe', res.key.name)
+
+    # Prepares the new entity
+    task = datastore.Entity(key=task_key)
+    print(res['name'])
+    task.update({
+        'name' : res['name'],
+        'instructions' : res['instructions'],
+        'rating': int(res['rating']) + new_rating,
+        'count': int(res['count']) + 1,
+    })
+
+    for x in range(1, 16):
+        task.update({
+            'ingredient_' + str(x) : res['ingredient_' + str(x)].lower()
+        })
+
+    for x in range(1, 16):
+        task.update({
+            'measurement_' + str(x) : res['measurement_' + str(x)].lower()
+        })
+
+    # Saves the entity
+    datastore_client.put(task)
+
+def getRatings(drink_name):
+
+    # Instantiates a client
+    datastore_client = datastore.Client('the-mixologist')
+
+    # The kind for the new entity
+    query = datastore_client.query(kind='Recipe')
+
+    query.add_filter('name', '=', drink_name)
+    result = query.fetch()
+
+    for res in result:
+
+        avg_rating = int(res['rating'])/int(res['count'])
+
+    return avg_rating
 
 # ingredients = ['Light rum', 'Ginger beer', 'Lemon peel']
 # ingredients = [x.lower() for x in ingredients]
@@ -88,7 +146,7 @@ def n_drinks(ingredients, drinks, n):
 
 #route returns exact drinks
 @app.route('/exact',methods = ["POST"])
-def eligible_endpoint():
+def exact_endpoint():
     client = create_client('the-mixologist')
     query = client.query(kind='Recipe')
     ingredients = request.get_json(force=True)['ingredients']
@@ -100,7 +158,7 @@ def eligible_endpoint():
 
 # route returns n drinks away
 @app.route('/n_away',methods = ["POST"])
-def eligible2_endpoint():
+def n_endpoint():
     client = create_client('the-mixologist')
     query = client.query(kind='Recipe')
     ingredients = request.get_json(force=True)['ingredients']
@@ -109,6 +167,32 @@ def eligible2_endpoint():
     drinks = elgible_drinks(ingredients, query)
     n = n_drinks(ingredients, drinks)
     return jsonify(n)
+
+# route returns all searches
+@app.route('/search',methods = ["POST"])
+def n_endpoint():
+    client = create_client('the-mixologist')
+    query = client.query(kind='Recipe')
+    ingredients = request.get_json(force=True)['ingredients']
+    ingredients = [x.lower() for x in ingredients]
+    print(ingredients)
+    drinks = elgible_drinks(ingredients, query)
+    return jsonify(drinks)
+
+# return the average ratings
+@app.route('/get_ratings',methods = ["Post"])
+def n_endpoint():
+    name = request.get_json(force=True)['name'][0]
+    rating = getRatings(name)
+    return jsonify(rating)
+
+# set ratings
+@app.route('/set_ratings',methods = ["Post"])
+def n_endpoint():
+    drink = request.get_json(force=True)['ratings']
+    #drink[0]= drink name
+    #drink[1]= drink rating
+    rating = setRatings(drink[0], drink[1])
 
 if __name__ == '__main__':
     app.run()

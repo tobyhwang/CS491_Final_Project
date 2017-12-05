@@ -32,6 +32,8 @@ for drink in groupDrinks:
     task.update({
         'name' : drink[0]['strDrink'],
         'instructions' : drink[0]['strInstructions'],
+        'rating': 0,
+        'count': 0
     })
 
     for x in range(1, 16):
