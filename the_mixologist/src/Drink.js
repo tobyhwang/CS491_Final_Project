@@ -9,7 +9,6 @@ class Drink extends Component {
             name: this.props.name,
             item_1: this.props.item_1,
             json: this.props.json,
-            help: ""
         };
         this.constructHTML = this.constructHTML.bind(this);
         this.expandInfo = this.expandInfo.bind(this);
