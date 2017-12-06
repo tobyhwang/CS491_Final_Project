@@ -50,7 +50,7 @@ class Items extends Component {
         console.log("QUERY = " + querystring);
         
         var json = $.ajax({
-            url: "http://localhost:5000/exact",
+            url: "http://localhost:5000/search",
             type: "POST",
             data: querystring,
             // processData: false,

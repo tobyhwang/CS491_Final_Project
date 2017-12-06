@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import Drink from './Drink'
 
 var MAX_ITEM = 31;
-var item = "";
+// var drinks = "";
 class Recipes extends Component {
     constructor(props){
         super(props);
         this.state ={
             name: "",
-            json: null
+            json: null,
+            recipes: []
         };
     }
     loadRecipe(){
@@ -56,15 +57,8 @@ class Recipes extends Component {
             var amount_15 = recipes[drink][29];
             var instruction = recipes[drink][30];
             console.log(instruction);
-            
-            item = <Drink name = {drink} item_1 = {item_1} item_2 = {item_2} item_3 = {item_3} 
-                item_4 = {item_4} item_5 = {item_5} item_6 = {item_6} item_7 = {item_7} item_8 = {item_8}
-                 item_9 = {item_9} item_10 = {item_10} item_11 = {item_11} item_12 = {item_12} item_13 = {item_13}
-                  item_14 = {item_14} item_15 = {item_15} amount_1 = {amount_1} amount_2 = {amount_2} amount_3 = {amount_3} 
-                amount_4 = {amount_4} amount_5 = {amount_5} amount_6 = {amount_6} amount_7 = {amount_7} amount_8 = {amount_8}
-                 amount_9 = {amount_9} amount_10 = {amount_10} amount_11 = {amount_11} amount_12 = {amount_12} amount_13 = {amount_13}
-                  amount_14 = {amount_14} amount_15 = {amount_15} instruction = {instruction}/>
-                  
+            var drinkInfo = <Drink name = {drink} item_1 = {item_1} item_2 = {item_2} item_3 = {item_3} item_4 = {item_4} item_5 = {item_5} item_6 = {item_6} item_7 = {item_7} item_8 = {item_8} item_9 = {item_9} item_10 = {item_10} item_11 = {item_11} item_12 = {item_12} item_13 = {item_13} item_14 = {item_14} item_15 = {item_15} amount_1 = {amount_1} amount_2 = {amount_2} amount_3 = {amount_3} amount_4 = {amount_4} amount_5 = {amount_5} amount_6 = {amount_6} amount_7 = {amount_7} amount_8 = {amount_8} amount_9 = {amount_9} amount_10 = {amount_10} amount_11 = {amount_11} amount_12 = {amount_12} amount_13 = {amount_13} amount_14 = {amount_14} amount_15 = {amount_15} instruction = {instruction}/>;
+            this.state.recipes = [...this.state.recipes, drinkInfo]
             // console.log("asss + " + drink.valueOf());
             // for(var i = 0; i < MAX_ITEM; i++)
             // {
@@ -73,15 +67,17 @@ class Recipes extends Component {
         }
         // this.state.json = recipes;
         // console.log(this.state.json)
-        console.log("item = " + item);
+        console.log("item = " + drinkInfo);
     }
 
 
 
     render() {
+        var drinks = this.state.recipes;
         return (
+            
             <div onClick={this.loadRecipe()}>
-                {item}
+                {this.state.recipes}
             </div>
         );
     }
