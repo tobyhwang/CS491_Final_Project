@@ -4,16 +4,21 @@ import Recipes from './Recipes';
   
 class Items extends Component {
 
-  constructor(props){
-  	super(props);
-  	this.state ={
-        items:['Light rum', 'Lemon peel', 'Ginger beer'],
-        message: '',
-        recipeJSON: null
-    };
-    // this.findRecipe = this.findRecipe.bind(this);
+    constructor(props){
+        super(props);
+        this.state ={
+            items:['Light rum', 'Lemon peel', 'Ginger beer'],
+            message: '',
+            recipeJSON: null,
+            visibility: true
+        };
+        // this.findRecipe = this.findRecipe.bind(this);
+        this.itemLoader = this.itemLoader.bind(this);
 
-  }
+    }
+
+
+    itemLoa
 
     addItem(e){
       e.preventDefault();
@@ -72,6 +77,12 @@ class Items extends Component {
         this.setState({
             recipeJSON : json.responseJSON
         })
+
+        if (this.state.recipeJSON != []){
+            this.setState({
+                visibility : false
+            })
+        }
     }
 
     removeItem(item){
@@ -95,6 +106,13 @@ class Items extends Component {
 
     }
 
+    itemLoader(){
+        // console.log("itemloader");
+        return(
+            <Recipes recipeJSON={this.state.recipeJSON}/>
+        )
+    }
+
     clearAll(){
 
         this.setState({
@@ -102,76 +120,87 @@ class Items extends Component {
             message: 'No items are currently added'
         });
     }
+    loadHTML(){
+        const{items, message} = this.state;
+        if(this.state.visibility){
+            return (
+            <div>
+                <header>
+                    <h1>Ingredient List</h1>
+                </header>
+        
+                <form ref={input => this.addForm = input} className="form-inline" onSubmit={(e) => {this.addItem(e)}}>
+                    <div className="form-group">
+                        <label className="sr-only" htmlFor="newItemInput">Add New Item</label>
+                        <input ref={input => this.newItem = input} placeholder="ex. vodka" className="form-control" id="newItemInput"/>
+                        <button type="submit" className="btn btn-primary">+</button>
+                    </div>
+        
+                </form>
+        
+                <div className="App">
+                    {
+                        (message !== '' || items.length === 0) && <p className="message text-danger">{message}</p>
+                    }
+                    {
+                        items.length > 0 &&
+                        <table className = "table">
+                            {/* <caption>Ingredient List</caption> */}
+                            <thread>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thread>
+                            <tbody>
+                            {
+                                items.map(item => {
+                                    return(
+                                        <tr key = {item}>
+                                            <th scope = "row">{items.indexOf(item) + 1}</th>
+                                            <td>{item}</td>
+                                            <td className="text-right" colSpan="1">
+                                                <button onClick={(e)=> this.removeItem(item)} className="btn btn-default btn-sm">
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
+                            }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colSpan="1">&nbsp;</td>
+                                    <td className="text-right"></td>
+                                        <button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</button>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    }
+                </div>
+                <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">+</button>
+                
+            </div>
+        
+        
+            )
+        }
+        else{
+            return (<div></div>)
+        }
+    }
 
 
-render() {
-    const{items, message} = this.state;
-    return (
-      <div>
-          <header>
-              <h1>Ingredient List</h1>
-          </header>
-
-          <form ref={input => this.addForm = input} className="form-inline" onSubmit={(e) => {this.addItem(e)}}>
-              <div className="form-group">
-                  <label className="sr-only" htmlFor="newItemInput">Add New Item</label>
-                  <input ref={input => this.newItem = input} placeholder="ex. vodka" className="form-control" id="newItemInput"/>
-                  <button type="submit" className="btn btn-primary">+</button>
-              </div>
-
-          </form>
-
-          <div className="App">
-              {
-                  (message !== '' || items.length === 0) && <p className="message text-danger">{message}</p>
-              }
-              {
-                  items.length > 0 &&
-                  <table className = "table">
-                      <caption>Ingredient List</caption>
-                      <thread>
-                          <tr>
-                              <th>#</th>
-                              <th>Item</th>
-                              <th>Action</th>
-                          </tr>
-                      </thread>
-                      <tbody>
-                      {
-                          items.map(item => {
-                              return(
-                                  <tr key = {item}>
-                                      <th scope = "row">{items.indexOf(item) + 1}</th>
-                                      <td>{item}</td>
-                                      <td className="text-right" colSpan="1">
-                                          <button onClick={(e)=> this.removeItem(item)} className="btn btn-default btn-sm">
-                                              Remove
-                                          </button>
-                                      </td>
-                                  </tr>
-                              )
-                          })
-                      }
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                            <td colSpan="1">&nbsp;</td>
-                            <td className="text-right"></td>
-                                <button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</button>
-                        </tr>
-                      </tfoot>
-                  </table>
-              }
-          </div>
-          <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">+</button>
-          <Recipes recipeJSON={this.state.recipeJSON}/>
-
-      </div>
-
-
-    );
-  }
+    render() {
+        return(
+            <div>
+                <div>{this.loadHTML()}</div>
+                <div>{this.itemLoader()}</div>
+            </div>
+        )
+    }
 }
-
 
 export default Items;
