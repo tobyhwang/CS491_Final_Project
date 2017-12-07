@@ -79,45 +79,45 @@ def n_drinks(ingredients, drinks, n):
 
 def setRatings(drink_name,new_rating):
 
-# Instantiates a client
-datastore_client = datastore.Client('the-mixologist')
+    # Instantiates a client
+    datastore_client = datastore.Client('the-mixologist')
 
-# The kind for the new entity
-query = datastore_client.query(kind='Recipe')
+    # The kind for the new entity
+    query = datastore_client.query(kind='Recipe')
 
-query.add_filter('name', '=', drink_name)
-result = query.fetch()
+    query.add_filter('name', '=', drink_name)
+    result = query.fetch()
 
 
-for res in result:
+    for res in result:
 
-    # The name/ID for the new entity
-    # name = 'vodka'
-    # The Cloud Datastore key for the new entity
-    task_key = datastore_client.key('Recipe', res.key.name)
+        # The name/ID for the new entity
+        # name = 'vodka'
+        # The Cloud Datastore key for the new entity
+        task_key = datastore_client.key('Recipe', res.key.name)
 
-    # Prepares the new entity
-    task = datastore.Entity(key=task_key)
-    print(res['name'])
-    task.update({
-        'name' : res['name'],
-        'instructions' : res['instructions'],
-        'rating': int(res['rating']) + new_rating,
-        'count': int(res['count']) + 1,
-    })
-
-    for x in range(1, 16):
+        # Prepares the new entity
+        task = datastore.Entity(key=task_key)
+        print(res['name'])
         task.update({
-            'ingredient_' + str(x) : res['ingredient_' + str(x)].lower()
+            'name' : res['name'],
+            'instructions' : res['instructions'],
+            'rating': int(res['rating']) + new_rating,
+            'count': int(res['count']) + 1,
         })
 
-    for x in range(1, 16):
-        task.update({
-            'measurement_' + str(x) : res['measurement_' + str(x)].lower()
-        })
+        for x in range(1, 16):
+            task.update({
+                'ingredient_' + str(x) : res['ingredient_' + str(x)].lower()
+            })
 
-    # Saves the entity
-    datastore_client.put(task)
+        for x in range(1, 16):
+            task.update({
+                'measurement_' + str(x) : res['measurement_' + str(x)].lower()
+            })
+
+        # Saves the entity
+        datastore_client.put(task)
 
 def getRatings(drink_name):
 
@@ -183,14 +183,14 @@ def search_endpoint():
 
 # return the average ratings
 @app.route('/get_ratings',methods = ["Post"])
-def getratings_endpoint():
+def get_ratings_endpoint():
     name = request.get_json(force=True)['name'][0]
     rating = getRatings(name)
     return jsonify(rating)
 
 # set ratings
 @app.route('/set_ratings',methods = ["Post"])
-def setratings_endpoint():
+def set_ratings__endpoint():
     drink = request.get_json(force=True)['ratings']
     #drink[0]= drink name
     #drink[1]= drink rating
