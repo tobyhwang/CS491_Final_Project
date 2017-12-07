@@ -157,18 +157,26 @@ def exact_endpoint():
     return jsonify(exact)
 
 # route returns n drinks away
-@app.route('/n_away',methods = ["POST"])
-def n_endpoint():
+@app.route('/naway',methods = ["POST"])
+def naway_endpoint():
+    # client = create_client('the-mixologist')
+    # query = client.query(kind='Recipe')
+    # ingredients = request.get_json(force=True)['ingredients']
+    # ingredients = [x.lower() for x in ingredients]
+    # print(ingredients)
+    # drinks = elgible_drinks(ingredients, query)
+    # return jsonify(drinks)
     client = create_client('the-mixologist')
     query = client.query(kind='Recipe')
-    request = request.get_json(force=True)
-    ingredients = request['ingredients']
-    n = request['n']
+    req = request.get_json(force=True)
+    ingredients = req['ingredients']
+    n = req['n']
     ingredients = [x.lower() for x in ingredients]
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     n_output = n_drinks(ingredients, drinks, n)
-    return jsonify(n_ouput)
+    return jsonify(n_output)
+
 
 # route returns all searches
 @app.route('/search',methods = ["POST"])

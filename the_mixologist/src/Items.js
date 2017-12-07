@@ -10,15 +10,15 @@ class Items extends Component {
             items:['Light rum', 'Lemon peel', 'Ginger beer'],
             message: '',
             recipeJSON: null,
-            visibility: true
+            visibility: true,
+            n: 0
         };
         // this.findRecipe = this.findRecipe.bind(this);
         this.itemLoader = this.itemLoader.bind(this);
+        this.increment_n = this.increment_n.bind(this);
+        this.decrement_n = this.decrement_n.bind(this);
 
     }
-
-
-    itemLoa
 
     addItem(e){
       e.preventDefault();
@@ -50,12 +50,13 @@ class Items extends Component {
     findRecipe(){
         // console.log(this.state.items);
         var itemList = this.state.items.toString();
+        var n = this.state.n;
         var itemString = itemList.replace(/,/g, "\",\"");
-        var querystring = '{"ingredients":["'  + itemString + '"]}';
+        var querystring = '{"ingredients":["'  + itemString + '"], "n":' + n +'}';
         console.log("QUERY = " + querystring);
         
         var json = $.ajax({
-            url: "http://localhost:5000/search",
+            url: "http://localhost:5000/naway",
             type: "POST",
             data: querystring,
             // processData: false,
@@ -104,6 +105,34 @@ class Items extends Component {
             });
         }
 
+    }
+    
+    increment_n(){
+        var n = this.state.n;
+        if (n < 15){
+            this.setState({
+                n: (n + 1)
+            })
+        }
+        else{
+            this.setState({
+                message: 'Maximum difference value of 15'
+            })
+        }
+    }
+
+    decrement_n(){
+        var n = this.state.n;
+        if (n > 0){
+            this.setState({
+                n: (n - 1)
+            })
+        }
+        else{
+            this.setState({
+                message: 'Minimum difference value of 0'
+            })
+        }
     }
 
     itemLoader(){
@@ -171,11 +200,10 @@ class Items extends Component {
                             }
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <td colSpan="1">&nbsp;</td>
-                                    <td className="text-right"></td>
+                                <th><button onClick={this.decrement_n}>-</button>{this.state.n}<button onClick={this.increment_n}>+</button></th>
+                                <th>
                                         <button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</button>
-                                </tr>
+                                </th>
                             </tfoot>
                         </table>
                     }
