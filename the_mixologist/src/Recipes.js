@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Drink from './Drink'
 
-var MAX_ITEM = 31;
 // var drinks = "";
 class Recipes extends Component {
     constructor(props){
@@ -14,10 +13,12 @@ class Recipes extends Component {
     }
     loadRecipe(){
         this.state.recipes = [];
+        // if(this.state.recipes !== [])
+        //     this.setState({
+        //         recipes: []
+        //     })
 
         var recipes = this.props.recipeJSON;
-        // console.log("Recipe = " + JSON.stringify(recipes))
-        // console.log(recipes);
         for(var drink in recipes)
         {
             // if(drink)

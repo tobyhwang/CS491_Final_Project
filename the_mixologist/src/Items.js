@@ -11,12 +11,14 @@ class Items extends Component {
             message: '',
             recipeJSON: null,
             visibility: true,
-            n: 0
+            n: 0,
+            loading: false
         };
         // this.findRecipe = this.findRecipe.bind(this);
         this.itemLoader = this.itemLoader.bind(this);
         this.increment_n = this.increment_n.bind(this);
         this.decrement_n = this.decrement_n.bind(this);
+        this.findRecipe = this.findRecipe.bind(this);
 
     }
 
@@ -62,8 +64,12 @@ class Items extends Component {
             // processData: false,
             // contentType: 'application/json',
             dataType: "json",
-            async: false,
+            // async: false,
             success: function(response) {
+                // return response;
+                // this.setState({
+                //     recipeJSON : response.responseJSON
+                // })
                 return response;
             },
             error: function(response) {
@@ -73,17 +79,27 @@ class Items extends Component {
             complete: function(response) {
                 console.log("Connection Established", response);
             }
-        });
-
+        }).then(res => {
+            console.log('assss' + res)
+            this.setState({
+                recipeJSON : res,
+                loading: false
+            })
+            if (this.state.recipeJSON !== []){
+                this.setState({
+                    visibility : false
+                })
+            }
+        })
         this.setState({
-            recipeJSON : json.responseJSON
+            loading: true
         })
 
-        if (this.state.recipeJSON != []){
-            this.setState({
-                visibility : false
-            })
-        }
+        // this.setState({
+        //     recipeJSON : json.responseJSON
+        // })
+
+        
     }
 
     removeItem(item){
@@ -208,7 +224,7 @@ class Items extends Component {
                         </table>
                     }
                 </div>
-                <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">+</button>
+                <button onClick={this.findRecipe} className="btn btn-default btn-sm">Search</button>
                 
             </div>
         
@@ -220,12 +236,27 @@ class Items extends Component {
         }
     }
 
+    loadingScreen(){
+        if(this.state.loading){
+            return(
+                <div>Loading</div>
+            )
+        }
+        else{
+            return(
+                <div></div>
+            )
+        }
+    }
+
+
 
     render() {
         return(
             <div>
                 <div>{this.loadHTML()}</div>
                 <div>{this.itemLoader()}</div>
+                <div>{this.loadingScreen()}</div>
             </div>
         )
     }
