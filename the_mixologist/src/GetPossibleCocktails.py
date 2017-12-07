@@ -161,12 +161,14 @@ def exact_endpoint():
 def n_endpoint():
     client = create_client('the-mixologist')
     query = client.query(kind='Recipe')
-    ingredients = request.get_json(force=True)['ingredients']
+    request = request.get_json(force=True)
+    ingredients = request['ingredients']
+    n = request['n']
     ingredients = [x.lower() for x in ingredients]
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
-    n = n_drinks(ingredients, drinks)
-    return jsonify(n)
+    n_output = n_drinks(ingredients, drinks, n)
+    return jsonify(n_ouput)
 
 # route returns all searches
 @app.route('/search',methods = ["POST"])
