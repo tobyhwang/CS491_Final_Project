@@ -79,7 +79,8 @@ class Recipes extends Component {
         var drinks = this.state.recipes;
         return (
             
-            <div onClick={this.loadRecipe()}>
+            <div>
+                {this.loadRecipe()}
                 {this.state.recipes}
             </div>
         );

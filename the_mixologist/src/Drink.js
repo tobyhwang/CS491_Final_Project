@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import { ListGroup, ListGroupItem } from 'reactstrap';
 
 class Drink extends Component {
 
@@ -85,7 +86,9 @@ class Drink extends Component {
     render() {
         return(
             <div>
-                <button onClick={this.expandInfo}>{this.props.name}</button>
+                {/* <button onClick={this.expandInfo}>{this.props.name}</button> */}
+                
+                <ListGroupItem tag="a" onClick={this.expandInfo}>{this.props.name}</ListGroupItem>
                 {this.displayDrink()}
             </div>
         )
