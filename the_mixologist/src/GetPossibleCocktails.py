@@ -39,6 +39,9 @@ def elgible_drinks(ingredients, query):
                         drinks[res['name']].append(res['measurement_' + str(j)])
                 # finally the instructions
                 drinks[res['name']].append(res['instructions'])
+                drinks[res['name']].append(res['count'])
+                drinks[res['name']].append(res['rating'])
+                
 
             query = client.query(kind = 'Recipe')
 
@@ -165,10 +168,13 @@ def naway_endpoint():
     req = request.get_json(force=True)
     ingredients = req['ingredients']
     n = req['n']
+    # name = req['name'][0]
+    # rating = getRatings(name)
     ingredients = [x.lower() for x in ingredients]
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     n_output = n_drinks(ingredients, drinks, n)
+    print(n_output)
     return jsonify(n_output)
 
 
