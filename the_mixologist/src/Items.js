@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 import Drink from './Drink'
+import Rating from 'react-star-ratings'
 
   
 class Items extends Component {
@@ -31,6 +32,7 @@ class Items extends Component {
         this.expandRecipe = this.expandRecipe.bind(this);
         this.onStart = this.onStart.bind(this);
         this.loadNav = this.loadNav.bind(this);
+        this.changeRating = this.changeRating.bind(this);
 
     }
 
@@ -101,6 +103,7 @@ class Items extends Component {
 
             //Found some recipes, load out the recipes page
             if (Object.keys(res).length !== 0){
+                console.log(res)
                 $( "#recipes" ).attr("active", "true");
                 $( "#home" ).attr("active", "false");
                 this.setState({
@@ -181,6 +184,13 @@ class Items extends Component {
         })
     }
 
+    changeRating( newRating ) {
+        console.log("I LOVE ASS = " + newRating);
+        this.setState({
+          rating: newRating
+        });
+      }
+
     expandRecipe(name){
         var recipes = this.state.recipeJSON;
         if(this.state.recipesVisibility && Object.keys(recipes).length !== 0){
@@ -199,7 +209,13 @@ class Items extends Component {
             (recipes[name][12] !== '') && <div key="13">{recipes[name][27]}{recipes[name][12]}</div>,
             (recipes[name][13] !== '') && <div key="14">{recipes[name][28]}{recipes[name][13]}</div>,
             (recipes[name][14] !== '') && <div key="15">{recipes[name][29]}{recipes[name][14]}</div>,
-            (recipes[name][30] !== '') && <div key="16">Instruction: {recipes[name][30]}</div>]
+            (recipes[name][30] !== '') && <div key="16">Instruction: {recipes[name][30]}</div>,
+            <Rating rating={recipes[name][32]/recipes[name][31]}
+                isSelectable={true}
+                isAggregateRating={true}
+                changeRating={this.changeRating}
+                starRatedColor='rgb(230, 67, 47)'
+                numOfStars={ 5 }/>]
 
             this.setState({
                 currentRecipe : html,
@@ -211,7 +227,6 @@ class Items extends Component {
             this.setState({
                 navtab : <NavItem><NavLink className={ this.state.activeTab === "current" ? "active" : "link"} onClick={this.loadNav}>{name}</NavLink></NavItem>
             })
-            console.log("assss " + this.state.activeTab)
                 
         }
     }
