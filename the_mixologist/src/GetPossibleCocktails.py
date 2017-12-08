@@ -76,7 +76,7 @@ def n_drinks(ingredients, drinks, n):
         for item in v[0:15]:
             if item in ingredients or item == '':
                 matched += 1
-        if 15 - n == matched:
+        if matched >= 15 - n:
             n_eligible[k] = v
 
     return n_eligible
@@ -199,10 +199,12 @@ def get_ratings_endpoint():
 # set ratings
 @app.route('/set_ratings',methods = ["Post"])
 def set_ratings__endpoint():
-    drink = request.get_json(force=True)['ratings']
-    #drink[0]= drink name
-    #drink[1]= drink rating
-    rating = setRatings(drink[0], drink[1])
+    drink = request.get_json(force=True)
+    name = drink['name']
+    rating = drink['ratings']
+    setRatings(name, rating)
+
+    return getRatings(name)
 
 
 
