@@ -5,6 +5,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask_cors import CORS
+
 app = Flask(__name__)
 CORS(app)
 
@@ -157,18 +158,19 @@ def exact_endpoint():
     return jsonify(exact)
 
 # route returns n drinks away
-@app.route('/n_away',methods = ["POST"])
-def n_endpoint():
+@app.route('/naway',methods = ["POST"])
+def naway_endpoint():
     client = create_client('the-mixologist')
     query = client.query(kind='Recipe')
-    request = request.get_json(force=True)
-    ingredients = request['ingredients']
-    n = request['n']
+    req = request.get_json(force=True)
+    ingredients = req['ingredients']
+    n = req['n']
     ingredients = [x.lower() for x in ingredients]
     print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     n_output = n_drinks(ingredients, drinks, n)
-    return jsonify(n_ouput)
+    return jsonify(n_output)
+
 
 # route returns all searches
 @app.route('/search',methods = ["POST"])
@@ -196,5 +198,14 @@ def set_ratings__endpoint():
     #drink[1]= drink rating
     rating = setRatings(drink[0], drink[1])
 
+
+
+# def main():
+#     "Start gevent WSGI server"
+#     # use gevent WSGI server instead of the Flask
+#     http = WSGIServer(('', 5000), app.wsgi_app)
+#     # TODO gracefully handle shutdown
+#     http.serve_forever()
+
 if __name__ == '__main__':
-    app.run()
+    app.run(threaded=True)

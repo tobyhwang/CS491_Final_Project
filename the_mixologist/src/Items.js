@@ -1,24 +1,35 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
 import Recipes from './Recipes';
+import { Nav, NavItem, NavLink } from 'reactstrap';
   
 class Items extends Component {
 
     constructor(props){
         super(props);
         this.state ={
-            items:['Light rum', 'Lemon peel', 'Ginger beer'],
+            items:["lemon peel", "ginger beer", "light rum"],
             message: '',
             recipeJSON: null,
-            visibility: true
+            homeVisibility: true,
+            recipesVisibility: false,
+            n: 0,
+            loading: false,
+            activeTab: "home"
         };
         // this.findRecipe = this.findRecipe.bind(this);
-        this.itemLoader = this.itemLoader.bind(this);
+        this.recipesLoader = this.recipesLoader.bind(this);
+        this.increment_n = this.increment_n.bind(this);
+        this.decrement_n = this.decrement_n.bind(this);
+        this.findRecipe = this.findRecipe.bind(this);
+        this.homepage = this.homepage.bind(this);
+        this.recipes = this.recipes.bind(this);
 
     }
 
-
-    itemLoa
+    recipes(){
+        console.log("hi");
+    }
 
     addItem(e){
       e.preventDefault();
@@ -49,19 +60,24 @@ class Items extends Component {
 
     findRecipe(){
         // console.log(this.state.items);
+        if (this.state.items.length === 0)
+        {
+            this.setState({
+                message: "No ingredients have been given."
+            })
+            return;
+        }
         var itemList = this.state.items.toString();
+        var n = this.state.n;
         var itemString = itemList.replace(/,/g, "\",\"");
-        var querystring = '{"ingredients":["'  + itemString + '"]}';
+        var querystring = '{"ingredients":["'  + itemString + '"], "n":' + n +'}';
         console.log("QUERY = " + querystring);
         
         var json = $.ajax({
-            url: "http://localhost:5000/search",
+            url: "http://localhost:5000/naway",
             type: "POST",
             data: querystring,
-            // processData: false,
-            // contentType: 'application/json',
             dataType: "json",
-            async: false,
             success: function(response) {
                 return response;
             },
@@ -72,17 +88,32 @@ class Items extends Component {
             complete: function(response) {
                 console.log("Connection Established", response);
             }
-        });
-
-        this.setState({
-            recipeJSON : json.responseJSON
-        })
-
-        if (this.state.recipeJSON != []){
+        }).then(res => {
             this.setState({
-                visibility : false
+                recipeJSON : res,
+                loading: false
             })
-        }
+
+            //Found some recipes, load out the recipes page
+            if (Object.keys(res).length !== 0){
+                $( "#recipes" ).attr("active", "true");
+                $( "#home" ).attr("active", "false");
+                this.setState({
+                    homeVisibility : false,
+                    recipesVisibility : true,
+                    activeTab: "recipes"
+                })
+                $('#home').text("New Search")
+            }
+            else{
+                this.setState({
+                    message: "Could not find any recipes with the list of ingredients. Please try again."
+                })
+            }
+        })
+        this.setState({
+            loading: true
+        })
     }
 
     removeItem(item){
@@ -105,12 +136,41 @@ class Items extends Component {
         }
 
     }
+    
+    increment_n(){
+        var n = this.state.n;
+        if (n < 15){
+            this.setState({
+                n: (n + 1)
+            })
+        }
+        else{
+            this.setState({
+                message: 'Maximum difference value of 15'
+            })
+        }
+    }
 
-    itemLoader(){
-        // console.log("itemloader");
-        return(
-            <Recipes recipeJSON={this.state.recipeJSON}/>
-        )
+    decrement_n(){
+        var n = this.state.n;
+        if (n > 0){
+            this.setState({
+                n: (n - 1)
+            })
+        }
+        else{
+            this.setState({
+                message: 'Minimum difference value of 0'
+            })
+        }
+    }
+
+    recipesLoader(){
+        if(this.state.recipesVisibility){
+            return(
+                <Recipes recipeJSON={this.state.recipeJSON}/>
+            )
+        }
     }
 
     clearAll(){
@@ -122,7 +182,7 @@ class Items extends Component {
     }
     loadHTML(){
         const{items, message} = this.state;
-        if(this.state.visibility){
+        if(this.state.homeVisibility){
             return (
             <div>
                 <header>
@@ -171,16 +231,15 @@ class Items extends Component {
                             }
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <td colSpan="1">&nbsp;</td>
-                                    <td className="text-right"></td>
+                                <th><button onClick={this.decrement_n}>-</button>{this.state.n}<button onClick={this.increment_n}>+</button></th>
+                                <th>
                                         <button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</button>
-                                </tr>
+                                </th>
                             </tfoot>
                         </table>
                     }
                 </div>
-                <button onClick={(e) => this.findRecipe()} className="btn btn-default btn-sm">+</button>
+                <button onClick={this.findRecipe} className="btn btn-default btn-sm">Search</button>
                 
             </div>
         
@@ -192,12 +251,73 @@ class Items extends Component {
         }
     }
 
+    loadingScreen(){
+        if(this.state.loading){
+            return(
+                <div>Loading</div>
+            )
+        }
+        else{
+            return(
+                <div></div>
+            )
+        }
+    }
+
+    homepage(){
+        if(this.state.activeTab === "home"){
+            //Already on the homepage, don't do anything
+        }
+        else{
+            this.setState({
+                items: [],
+                homeVisibility: true,
+                recipesVisibility: false,
+                activeTab: "home"
+            })
+            $('#home').text("The Mixologist")
+        }
+    }
+
+    recipes(){
+        if(this.state.recipeJSON === null){
+            //Already on the homepage, don't do anything
+            this.setState({
+                message : "No recipes have been loaded yet. Please search for recipes."
+            })
+            return; 
+        }
+        if(this.state.activeTab === "recipes"){
+            //Already on the homepage, don't do anything
+        }
+        else{
+            this.setState({
+                items: [],
+                homeVisibility: false,
+                recipesVisibility: true,
+                activeTab: "recipes"
+            })
+        }
+    }
+
 
     render() {
         return(
             <div>
+            <div>
+            <Nav tabs>
+                <NavItem>
+                    <NavLink id="home" className="link" className={ this.state.activeTab === "home" ? "active" : "link"} onClick={this.homepage}>The Mixologist</NavLink>
+                </NavItem>
+                <NavItem>
+                    <NavLink id="recipes" className='link' className={ this.state.activeTab === "recipes" ? "active" : "link"} onClick={this.recipes}>Recent Search</NavLink>
+                </NavItem>
+            </Nav>
+            </div>
+                
                 <div>{this.loadHTML()}</div>
-                <div>{this.itemLoader()}</div>
+                <div>{this.recipesLoader()}</div>
+                <div>{this.loadingScreen()}</div>
             </div>
         )
     }
