@@ -76,7 +76,6 @@ class Recipes extends Component {
 
 
     render() {
-        var drinks = this.state.recipes;
         return (
             
             <div>
