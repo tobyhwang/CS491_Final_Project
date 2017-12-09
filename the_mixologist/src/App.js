@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Items from './Items';
+import Mixologist from './Mixologist';
 
 class App extends Component {
+  //Load out the mixologist application
   render() {
     return (
-      /*Ingredient Module: User can add an ingredient to a list*/
       <div className="App">
-        <Items/>
-        
+        <Mixologist/>  
       </div>
-
     );
   }
 }
-
-
 export default App;
