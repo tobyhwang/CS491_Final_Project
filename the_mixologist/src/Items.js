@@ -3,6 +3,7 @@ import $ from 'jquery';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 import Drink from './Drink'
 import Rating from 'react-star-ratings'
+import {Loader} from 'semantic-ui-react'
 
   
 class Items extends Component {
@@ -416,11 +417,11 @@ class Items extends Component {
             return (<div></div>)
         }
     }
-
+    // <Loading show={true} message='loading'/> 
     loadingScreen(){
         if(this.state.loading){
             return(
-                <div>Loading</div>
+                <Loader active/>
             )
         }
         else{
