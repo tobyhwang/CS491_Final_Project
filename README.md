@@ -4,7 +4,7 @@ This project focuses on creating a web application using an ensemble of web tech
 
 ### Notes to the Grader
 
-As discussed with Professor Kanich, we will not be handling reviews as previously stated in the proposal due to the fact that we are not creating any type of login profiles.  Instead we will allow the user to rate each drink only once per browsing session.  So a user can't review a drink more than once in a session.  
+As discussed with Professor Kanich, we will not be handling reviews as previously stated in the proposal due to the fact that we are not creating any type of login profiles.  Instead we will allow the user to rate each drink only once per browsing session.  So a user can't review a drink more than once in a session.  Loading time for drinks will take a little bit of time, but if there is noticable lag (or anything else related), just refresh the url.
 
 ### Prerequisites & Installing
 
@@ -51,11 +51,11 @@ npm install && npm run
 9) Average rating of beverage will also be displayed to the user
 
 ## Sample Cases
-1) Light rum, ginger beer, light rum
-2)
-3)
-4)
-5)
+1) Light rum, ginger beer, light rum  n=0
+2) Gin, lime  n=2
+3) Tequila  n=2
+4) Armaretto, coke  n=3
+5) Vodka, rum  n=2
 
 ## Built With
 
