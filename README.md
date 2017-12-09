@@ -53,7 +53,7 @@ npm start
 9) Average rating of beverage will also be displayed to the user
 
 ## Sample Cases
-1) Light rum, ginger beer, light rum  n=0
+1) Light rum, ginger beer, lemon peel  n=0
 2) Gin, lime  n=2
 3) Tequila  n=2
 4) Armaretto, coke  n=3
