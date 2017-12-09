@@ -21,7 +21,13 @@ class Items extends Component {
             activeTab: "home",
             currentRecipe : [],
             currentRecipeName : "",
-            navtab : null
+            currentAvg: 0,
+            navtab : null,
+            rating: 0,
+            ratedDictionary : [],
+            ratingMessage: '',
+            messageState: false,
+            shoppingList: []
         };
         this.recipesLoader = this.recipesLoader.bind(this);
         this.increment_n = this.increment_n.bind(this);
@@ -33,7 +39,8 @@ class Items extends Component {
         this.onStart = this.onStart.bind(this);
         this.loadNav = this.loadNav.bind(this);
         this.changeRating = this.changeRating.bind(this);
-
+        this.displayRating = this.displayRating.bind(this);
+        this.shoppingList = this.shoppingList.bind(this);
     }
 
     recipes(){
@@ -111,7 +118,7 @@ class Items extends Component {
                     homeVisibility : false,
                     recipesVisibility : true,
                     individualVisibility : false,
-                    activeTab: "recipes"
+                    activeTab: "recipes",
                 })
                 $('#home').text("New Search")
             }
@@ -178,6 +185,7 @@ class Items extends Component {
     loadNav(){
         this.setState({
             individualVisibility : true,
+            shoppingList: [],
             recipesVisibility : false,
             homeVisibility : false,
             activeTab: "current"
@@ -185,75 +193,142 @@ class Items extends Component {
     }
 
     changeRating( newRating ) {
-        console.log("I LOVE ASS = " + newRating);
-        console.log("MY NAME IS " + this.state.currentRecipeName)
-        
-        // var querystring = '{"ingredients":["'  + itemString + '"], "n":' + n +'}';
         var querystring = '{"name": "'  + this.state.currentRecipeName + '", "ratings":"' + newRating +'"}';
         console.log(querystring);
-        $.ajax({
-            url: "http://localhost:5000/setratings",
-            type: "POST",
-            data: querystring,
-            dataType: "json",
-            success: function(response) {
-                return response;
-            },
-            error: function(response) {
-                console.log("Connection Problem", response);
-            },
-
-            complete: function(response) {
-                console.log("Connection Established", response);
-            }
-        }).then((req)=>{
-            console.log(req)    
-        })
+        var dictionary = this.state.ratedDictionary;
+        console.log("FUCKEN LOVE ASS = " + dictionary[this.state.currentRecipeName])
+        if(dictionary[this.state.currentRecipeName]){
+            //This user already rated this drink
+            this.setState({
+                rating: dictionary[this.state.currentRecipeName],
+                ratingMessage : "You've already rated this drink.",
+                messageState: false
+            })
+        }
+        else{
+            //Set new rating
         
-        this.setState({
-          rating: newRating
-        });
-      }
+            dictionary[this.state.currentRecipeName] = newRating;
+            // this.setState({
+            // })
+            $.ajax({
+                url: "http://localhost:5000/setratings",
+                type: "POST",
+                data: querystring,
+                dataType: "json",
+                success: function(response) {
+                    return response;
+                },
+                error: function(response) {
+                    console.log("Connection Problem", response);
+                },
+
+                complete: function(response) {
+                    console.log("Connection Established", response);
+                }
+            }).then((req)=>{
+                console.log(req)
+                console.log(req['count'])
+                console.log(req['rating'])
+                var avg = req['rating']/req['count'];
+                avg = avg.toFixed(2);
+                $('#avg').text(avg)
+                $('#currentRating').attr('rating', newRating)
+                this.setState({
+                    rating: newRating,
+                    currentAvg: avg,
+                    ratedDictionary: dictionary,
+                    ratingMessage: "You've rated this drink.",
+                    messageState: true
+                });
+            })
+        }
+    }
+
 
     expandRecipe(name){
         var recipes = this.state.recipeJSON;
+        
         if(this.state.recipesVisibility && Object.keys(recipes).length !== 0){
-            var html = [(recipes[name][0] !== '') && (<div key="1">{recipes[name][15]}{recipes[name][0]}</div>),
-            (recipes[name][1] !== '') && <div key="2">{recipes[name][16]}{recipes[name][1]}</div>,
-            (recipes[name][2] !== '') && <div key="3">{recipes[name][17]}{recipes[name][2]}</div>,
-            (recipes[name][3] !== '') && <div key="4">{recipes[name][18]}{recipes[name][3]}</div>,
-            (recipes[name][4] !== '') && <div key="5">{recipes[name][19]}{recipes[name][4]}</div>,
-            (recipes[name][5] !== '') && <div key="6">{recipes[name][20]}{recipes[name][5]}</div>,
-            (recipes[name][6] !== '') && <div key="7">{recipes[name][21]}{recipes[name][6]}</div>,
-            (recipes[name][7] !== '') && <div key="8">{recipes[name][22]}{recipes[name][7]}</div>,
-            (recipes[name][8] !== '') && <div key="9">{recipes[name][23]}{recipes[name][8]}</div>,
-            (recipes[name][9] !== '') && <div key="10">{recipes[name][24]}{recipes[name][9]}</div>,
-            (recipes[name][10] !== '') && <div key="11">{recipes[name][25]}{recipes[name][10]}</div>,
-            (recipes[name][11] !== '') && <div key="12">{recipes[name][26]}{recipes[name][11]}</div>,
-            (recipes[name][12] !== '') && <div key="13">{recipes[name][27]}{recipes[name][12]}</div>,
-            (recipes[name][13] !== '') && <div key="14">{recipes[name][28]}{recipes[name][13]}</div>,
-            (recipes[name][14] !== '') && <div key="15">{recipes[name][29]}{recipes[name][14]}</div>,
-            (recipes[name][30] !== '') && <div key="16">Instruction: {recipes[name][30]}</div>,
-            <div> rating = {recipes[name][31]} count = {recipes[name][32]}</div>,
-            <Rating rating={recipes[name][32]/recipes[name][31]}
-                isSelectable={true}
-                isAggregateRating={true}
-                changeRating={this.changeRating}
-                starRatedColor='rgb(230, 67, 47)'
-                numOfStars={ 5 }/>]
-
+            var avg = 0;
+            if (recipes[name][32] === 0 && recipes[name][31]===0){
+                avg = 0
+            }
+            else{
+                avg = recipes[name][32]/recipes[name][31];
+                avg = avg.toFixed(2);
+            }
+            
+            var html = [(recipes[name][0] !== '') && (<div key="1">{recipes[name][15]} {recipes[name][0]}</div>),
+            (recipes[name][1] !== '') && <div key="2">{recipes[name][16]} {recipes[name][1]}</div>,
+            (recipes[name][2] !== '') && <div key="3">{recipes[name][17]} {recipes[name][2]}</div>,
+            (recipes[name][3] !== '') && <div key="4">{recipes[name][18]} {recipes[name][3]}</div>,
+            (recipes[name][4] !== '') && <div key="5">{recipes[name][19]} {recipes[name][4]}</div>,
+            (recipes[name][5] !== '') && <div key="6">{recipes[name][20]} {recipes[name][5]}</div>,
+            (recipes[name][6] !== '') && <div key="7">{recipes[name][21]} {recipes[name][6]}</div>,
+            (recipes[name][7] !== '') && <div key="8">{recipes[name][22]} {recipes[name][7]}</div>,
+            (recipes[name][8] !== '') && <div key="9">{recipes[name][23]} {recipes[name][8]}</div>,
+            (recipes[name][9] !== '') && <div key="10">{recipes[name][24]} {recipes[name][9]}</div>,
+            (recipes[name][10] !== '') && <div key="11">{recipes[name][25]} {recipes[name][10]}</div>,
+            (recipes[name][11] !== '') && <div key="12">{recipes[name][26]} {recipes[name][11]}</div>,
+            (recipes[name][12] !== '') && <div key="13">{recipes[name][27]} {recipes[name][12]}</div>,
+            (recipes[name][13] !== '') && <div key="14">{recipes[name][28]} {recipes[name][13]}</div>,
+            (recipes[name][14] !== '') && <div key="15">{recipes[name][29]} {recipes[name][14]}</div>,
+            (recipes[name][30] !== '') && <div key="16">Instruction: {recipes[name][30]}</div>]
+            
+            if(this.state.ratedDictionary[name] >= 0){
+                this.setState({
+                    rating : this.state.ratedDictionary[name],
+                    ratingMessage: "You've already rated this drink",
+                    messageState: false
+                })
+            }
+            else{
+                this.setState({
+                    rating : 0,
+                    messageState: true,
+                    ratingMessage: "Please rate this drink!!!"
+                })
+            }
             this.setState({
                 currentRecipe : html,
                 individualVisibility : true,
                 recipesVisibility : false,
                 homeVisibility : false,
                 activeTab : "current",
-                currentRecipeName : name
-            })
-            this.setState({
+                currentRecipeName : name,
+                currentAvg : avg,
+                rating : this.state.ratedDictionary[name],
+                shoppingList : [],
                 navtab : <NavItem><NavLink className={ this.state.activeTab === "current" ? "active" : "link"} onClick={this.loadNav}>{name}</NavLink></NavItem>
             })
                 
+        }
+    }
+    // {
+    //     (message !== '' ) && <p className="message text-danger">{message}</p>
+    //     }
+    displayRating(){
+        var message = this.state.ratingMessage
+        if(this.state.individualVisibility){
+            return(
+                <div>
+
+                    <div> Average rating for this recipe is <b>{this.state.currentAvg}/5.00</b></div>
+                    <Rating id="currentRating"
+                        rating={this.state.rating}
+                        isSelectable={true}
+                        isAggregateRating={true}
+                        changeRating={this.changeRating}
+                        starSelectingHoverColor='rgb(255, 255, 0)'
+                        starRatedColor='rgb(255, 255, 0)'
+                        numOfStars={ 5 }/>
+                        
+                        {
+                        (message !== '' ) && <p className={this.state.messageState ? "message text-success" : "message text-danger"}>{message}</p>
+                        }
+                </div>
+                )
         }
     }
 
@@ -266,7 +341,7 @@ class Items extends Component {
             if(this.state.recipesVisibility && Object.keys(recipes).length !== 0){
                 for(var drink in recipes)
                 {
-                    html = [...html, <Drink key = {i} name = {drink} recipes = {this.state.recipeJSON} onClick = {this.expandRecipe}/>]
+                    html = [...html, <Drink key = {i} name = {drink} recipes = {this.state.recipeJSON} onClick = {this.expandRecipe} />]
                     i++;
                 }
                 return html;
@@ -309,14 +384,11 @@ class Items extends Component {
                         items.length > 0 &&
                         <table className = "table">
                             {/* <caption>Ingredient List</caption> */}
-                            <thread>
+                            <tbody>
                                 <tr>
                                     <th>#</th>
                                     <th>Item</th>
-                                    <th>Action</th>
                                 </tr>
-                            </thread>
-                            <tbody>
                             {
                                 items.map(item => {
                                     return(
@@ -378,7 +450,8 @@ class Items extends Component {
                 recipesVisibility: false,
                 individualVisibility: false,
                 activeTab: "home",
-                message: ""
+                message: "",
+                shoppingList: []
             })
             $('#home').text("The Mixologist")
         }
@@ -409,7 +482,8 @@ class Items extends Component {
                 homeVisibility: false,
                 recipesVisibility: true,
                 individualVisibility: false,
-                activeTab: "recipes"
+                activeTab: "recipes",
+                shoppingList: []
             })
         }
     }
@@ -435,6 +509,49 @@ class Items extends Component {
         )
     }
 
+    shoppingList(){
+        if(this.state.individualVisibility)
+        {
+            if(this.state.recipeJSON && (this.state.currentRecipeName !== '') && (this.state.items !== []))
+            {
+                var shoppingList = this.state.shoppingList;
+                var recipeJson = this.state.recipeJSON;
+                var drink = this.state.currentRecipeName;
+                var itemList = this.state.items;
+                var length = itemList.length;
+
+                console.log(itemList);
+                // console.log(recipeJson[drink])
+                for(var i = 0; i < 15; i++)
+                {
+                    var currItem = recipeJson[drink][i];
+                    if(currItem !== '')
+                    {
+                        var inList = false;
+
+                        for(var j = 0; j < length; j++)
+                        {
+                            if(itemList[j] === currItem)
+                            {
+                                console.log(currItem + "exist in the list")
+                                inList = true; 
+                            }
+                        }
+                        if(!inList)
+                        {
+                            console.log(currItem + "item does not exist. Adding.....")
+                            // shoppingList = [...shoppingList, <div>{currItem}</div>]
+                            this.state.shoppingList = [...this.state.shoppingList, <div>{currItem}</div>]
+                        }
+                    }
+                }
+                return this.state.shoppingList;
+
+            }
+        }
+    }
+
+    // <div>{this.shoppingList()}</div>
 
     render() {
         return(
@@ -444,6 +561,7 @@ class Items extends Component {
                 <div>{this.recipesLoader()}</div>
                 <div>{this.loadingScreen()}</div>
                 <div>{this.loadIndividual()}</div>
+                <div>{this.displayRating()}</div>
             </div>
         )
     }
