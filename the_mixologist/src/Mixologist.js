@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-import { Nav, NavItem, NavLink } from 'reactstrap';
+import { Button, Nav, NavItem, NavLink } from 'reactstrap';
 import Drink from './Drink'
 import Rating from 'react-star-ratings'
 import {Loader} from 'semantic-ui-react'
 
   
-class Items extends Component {
-
+class Mixologist extends Component {
+    //Initialize the states and function of this component
     constructor(props){
         super(props);
         this.state ={
-            items:["lemon peel", "ginger beer", "light rum"],
+            items:[],
             message: '',
             recipeJSON: null,
             homeVisibility: true,
@@ -44,21 +44,20 @@ class Items extends Component {
         this.shoppingList = this.shoppingList.bind(this);
     }
 
+    //Allows user to add an item to the list of ingredient
     addItem(e){
       e.preventDefault();
       const {items} = this.state;
       const newItem = this.newItem.value;
-
       const existsOnList = items.includes(newItem);
 
+      //Check for duplicated ingredients
       if(existsOnList){
-
           this.setState({
             message: 'Ingredient already entered'
       });
 
       } else {
-
           //prevent empty submission
           newItem !== '' && this.setState({
               //previously stored items in the state, then add new item
@@ -66,12 +65,12 @@ class Items extends Component {
               message: ''
           });
       }
-
       this.addForm.reset();
     }
 
-
+    //Find all the recipes with the given list of ingredients
     findRecipe(){
+        //Make sure the list of ingredients is not empty, should not get to this point
         if (this.state.items.length === 0)
         {
             this.setState({
@@ -79,12 +78,13 @@ class Items extends Component {
             })
             return;
         }
+
         var itemList = this.state.items.toString();
         var n = this.state.n;
         var itemString = itemList.replace(/,/g, "\",\"");
         var querystring = '{"ingredients":["'  + itemString + '"], "n":' + n +'}';
-        // console.log("QUERY = " + querystring);
         
+        //Perform ajax call to python server to request a JSON of recipes
         $.ajax({
             url: "http://localhost:5000/naway",
             type: "POST",
@@ -101,14 +101,15 @@ class Items extends Component {
                 console.log("Connection Established", response);
             }
         }).then(res => {
+            //Turn loading screen off
             this.setState({
                 loading: false
             })
 
             //Found some recipes, load out the recipes page
             if (Object.keys(res).length !== 0){
-                $( "#recipes" ).attr("active", "true");
-                $( "#home" ).attr("active", "false");
+
+                //Load the list of recipes and switch tabs
                 this.setState({
                     recipeJSON : res,
                     homeVisibility : false,
@@ -116,40 +117,38 @@ class Items extends Component {
                     individualVisibility : false,
                     activeTab: "recipes",
                 })
-                $('#home').text("New Search")
             }
+            //Otherwise, we did not find any recipes with the given list of ingredients
             else{
                 this.setState({
                     message: "Could not find any recipes with the list of ingredients. Please try again."
                 })
             }
         })
+        //Turn on loading page
         this.setState({
             loading: true
         })
     }
 
+    //Remove an item from the list of ingredients
     removeItem(item){
-
         const newItems = this.state.items.filter(newItem =>{
            return  newItem !== item;
         });
 
         this.setState({
-
            items: [...newItems]
-
         });
-
 
         if(newItems.length === 0) {
             this.setState({
                 message: 'No items are currently added'
             });
         }
-
     }
     
+    //Button handler for incrementing the counter for the difference of ingredients
     increment_n(){
         var n = this.state.n;
         if (n < 15){
@@ -164,6 +163,7 @@ class Items extends Component {
         }
     }
 
+    //Button handler for decrementing the counter for the difference of ingredients
     decrement_n(){
         var n = this.state.n;
         if (n > 0){
@@ -178,6 +178,7 @@ class Items extends Component {
         }
     }
 
+    //Navbar tab handler, loads the recent drink that the user have looked up
     loadNav(){
         this.setState({
             individualVisibility : true,
@@ -188,24 +189,24 @@ class Items extends Component {
         })
     }
 
+    //Submit a rating to the python server
     changeRating( newRating ) {
         var querystring = '{"name": "'  + this.state.currentRecipeName + '", "ratings":"' + newRating +'"}';
-        // console.log(querystring);
         var dictionary = this.state.ratedDictionary;
         if(dictionary[this.state.currentRecipeName]){
             //This user already rated this drink
             this.setState({
                 rating: dictionary[this.state.currentRecipeName],
                 ratingMessage : "You've already rated this drink.",
-                messageState: false
+                messageState: false,
+                shoppingList: []
             })
         }
         else{
             //Set new rating
-        
             dictionary[this.state.currentRecipeName] = newRating;
-            // this.setState({
-            // })
+            
+            //Make an ajax call to change the current average rating of the drink
             $.ajax({
                 url: "http://localhost:5000/setratings",
                 type: "POST",
@@ -231,18 +232,21 @@ class Items extends Component {
                     currentAvg: avg,
                     ratedDictionary: dictionary,
                     ratingMessage: "You've rated this drink.",
-                    messageState: true
+                    messageState: true,
+                    shoppingList: []
                 });
             })
         }
     }
 
-
+    //Button handler for displaying the recipe
     expandRecipe(name){
         var recipes = this.state.recipeJSON;
-        
+        //Make sure we have a list of recipes to look through, otherwise don't perform any task
         if(this.state.recipesVisibility && Object.keys(recipes).length !== 0){
             var avg = 0;
+
+            //Retrieve the average rating on this drink
             if (recipes[name][32] === 0 && recipes[name][31]===0){
                 avg = 0
             }
@@ -251,6 +255,7 @@ class Items extends Component {
                 avg = avg.toFixed(2);
             }
             
+            //HTML to be loading in the drink's recipe tab
             var html = [(recipes[name][0] !== '') && (<div key="1">{recipes[name][15]} {recipes[name][0]}</div>),
             (recipes[name][1] !== '') && <div key="2">{recipes[name][16]} {recipes[name][1]}</div>,
             (recipes[name][2] !== '') && <div key="3">{recipes[name][17]} {recipes[name][2]}</div>,
@@ -268,13 +273,16 @@ class Items extends Component {
             (recipes[name][14] !== '') && <div key="15">{recipes[name][29]} {recipes[name][14]}</div>,
             (recipes[name][30] !== '') && <div key="16">Instruction: {recipes[name][30]}</div>]
             
+            //See if this user is allow to rate this drink
             if(this.state.ratedDictionary[name] >= 0){
+                //This user already rated this drink
                 this.setState({
                     rating : this.state.ratedDictionary[name],
                     ratingMessage: "You've already rated this drink",
                     messageState: false
                 })
             }
+            //Otherwise the user has not rated this drink
             else{
                 this.setState({
                     rating : 0,
@@ -282,6 +290,7 @@ class Items extends Component {
                     ratingMessage: "Please rate this drink!!!"
                 })
             }
+            //Load out the drink's recipe tab
             this.setState({
                 currentRecipe : html,
                 individualVisibility : true,
@@ -294,18 +303,18 @@ class Items extends Component {
                 shoppingList : [],
                 navtab : <NavItem><NavLink className={ this.state.activeTab === "current" ? "active" : "link"} onClick={this.loadNav}>{name}</NavLink></NavItem>
             })
-                
         }
     }
-    // {
-    //     (message !== '' ) && <p className="message text-danger">{message}</p>
-    //     }
+
+    //Display the rating component with the current drink's recipe being displayed
     displayRating(){
-        var message = this.state.ratingMessage
+        var message = this.state.ratingMessage;
+
+        //See if the drink's recipe tab should be active
         if(this.state.individualVisibility){
+            //If so, return the rating component
             return(
                 <div>
-
                     <div> Average rating for this recipe is <b>{this.state.currentAvg}/5.00</b></div>
                     <Rating id="currentRating"
                         rating={this.state.rating}
@@ -315,15 +324,13 @@ class Items extends Component {
                         starSelectingHoverColor='rgb(255, 255, 0)'
                         starRatedColor='rgb(255, 255, 0)'
                         numOfStars={ 5 }/>
-                        
-                        {
-                        (message !== '' ) && <p className={this.state.messageState ? "message text-success" : "message text-danger"}>{message}</p>
-                        }
+                        {(message !== '' ) && <p className={this.state.messageState ? "message text-success" : "message text-danger"}>{message}</p>}
                 </div>
-                )
+            )
         }
     }
 
+    //Load the list of recipes tab when active
     recipesLoader(){
         var recipes = this.state.recipeJSON;
         var html = [];
@@ -341,8 +348,7 @@ class Items extends Component {
         }
     }
 
-
-
+    //Clear all the ingredients given from the user
     clearAll(){
 
         this.setState({
@@ -350,6 +356,8 @@ class Items extends Component {
             message: 'No items are currently added'
         });
     }
+
+    //Load our main homepage html
     loadHTML(){
         const{items, message} = this.state;
         if(this.state.homeVisibility){
@@ -363,19 +371,16 @@ class Items extends Component {
                     <div className="form-group">
                         <label className="sr-only" htmlFor="newItemInput">Add New Item</label>
                         <input ref={input => this.newItem = input} placeholder="ex. vodka" className="form-control" id="newItemInput"/>
-                        <button type="submit" className="btn btn-primary">+</button>
+                        <Button type="submit" className="btn btn-primary">+</Button>
                     </div>
         
                 </form>
         
                 <div className="App">
-                    {
-                        (message !== '' || items.length === 0) && <p className="message text-danger">{message}</p>
-                    }
+                    {(message !== '' || items.length === 0) && <p className="message text-danger">{message}</p>}
                     {
                         items.length > 0 &&
                         <table className = "table">
-                            {/* <caption>Ingredient List</caption> */}
                             <tbody>
                                 <tr>
                                     <th>#</th>
@@ -388,9 +393,9 @@ class Items extends Component {
                                             <th scope = "row">{items.indexOf(item) + 1}</th>
                                             <td>{item}</td>
                                             <td className="text-right" colSpan="1">
-                                                <button onClick={(e)=> this.removeItem(item)} className="btn btn-default btn-sm">
+                                                <Button onClick={(e)=> this.removeItem(item)} className="btn btn-default btn-sm">
                                                     Remove
-                                                </button>
+                                                </Button>
                                             </td>
                                         </tr>
                                     )
@@ -398,26 +403,26 @@ class Items extends Component {
                             }
                             </tbody>
                             <tfoot>
-                                <th><button onClick={this.decrement_n}>-</button>{this.state.n}<button onClick={this.increment_n}>+</button></th>
-                                <th>
-                                        <button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</button>
-                                </th>
+                                <th>Load recipes with <Button onClick={this.decrement_n}>-</Button>  {this.state.n}  <Button onClick={this.increment_n}>+</Button> ingredients away</th>
+                                <td></td>
+                                <td className="text-right">
+                                        <Button onClick={(e) => this.clearAll()} className="btn btn-default btn-sm">Clear List</Button>
+                                </td>
                             </tfoot>
                         </table>
                     }
                 </div>
-                <button onClick={this.findRecipe} className="btn btn-default btn-sm">Search</button>
-                
+                <Button onClick={this.findRecipe} className="btn btn-default btn-sm">Search</Button>
             </div>
-        
-        
             )
         }
+        //Hide the home page
         else{
             return (<div></div>)
         }
     }
-    // <Loading show={true} message='loading'/> 
+
+    //Loading screen when activated by flag
     loadingScreen(){
         if(this.state.loading){
             return(
@@ -431,24 +436,23 @@ class Items extends Component {
         }
     }
 
+    //Load the home page
     homepage(){
         if(this.state.activeTab === "home"){
             //Already on the homepage, don't do anything
         }
         else{
             this.setState({
-                // items: [],
                 homeVisibility: true,
                 recipesVisibility: false,
                 individualVisibility: false,
                 activeTab: "home",
-                message: "",
-                // shoppingList: []
+                message: ""
             })
-            $('#home').text("The Mixologist")
         }
     }
 
+    //Load the list of recipes
     listofrecipes(){
         if(!this.state.recipeJSON)
         {
@@ -470,16 +474,15 @@ class Items extends Component {
         }
         else{
             this.setState({
-                // items: [],
                 homeVisibility: false,
                 recipesVisibility: true,
                 individualVisibility: false,
-                activeTab: "recipes",
-                // shoppingList: []
+                activeTab: "recipes"
             })
         }
     }
 
+    //Load the current recipe
     loadIndividual(){
         if(this.state.individualVisibility)
         {
@@ -487,6 +490,7 @@ class Items extends Component {
         }
     }
 
+    //Helper function to load a dynamic navbar
     onStart(){
         return (
             <Nav tabs>
@@ -501,6 +505,7 @@ class Items extends Component {
         )
     }
 
+    //Create a shopping list of missing ingredients
     shoppingList(){
         if(this.state.individualVisibility)
         {
@@ -523,13 +528,11 @@ class Items extends Component {
                         {
                             if(itemList[j] === currItem)
                             {
-                                // console.log(currItem + "exist in the list")
                                 inList = true; 
                             }
                         }
                         if(!inList)
                         {
-                            // console.log(currItem + "item does not exist. Adding.....")
                             this.state.shoppingList = [...this.state.shoppingList, <div>-{currItem}</div>]
                         }
                     }
@@ -563,4 +566,4 @@ class Items extends Component {
     }
 }
 
-export default Items;
+export default Mixologist;
