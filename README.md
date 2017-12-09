@@ -35,7 +35,8 @@ flask run
 2) Run the React Application by navigating to the-mixologist directory.
 
 ```
-npm install && npm run
+npm install
+npm start
 ```
 
 
