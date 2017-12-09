@@ -43,10 +43,6 @@ class Items extends Component {
         this.shoppingList = this.shoppingList.bind(this);
     }
 
-    recipes(){
-        console.log("hi");
-    }
-
     addItem(e){
       e.preventDefault();
       const {items} = this.state;
@@ -110,7 +106,6 @@ class Items extends Component {
 
             //Found some recipes, load out the recipes page
             if (Object.keys(res).length !== 0){
-                console.log(res)
                 $( "#recipes" ).attr("active", "true");
                 $( "#home" ).attr("active", "false");
                 this.setState({
@@ -194,9 +189,8 @@ class Items extends Component {
 
     changeRating( newRating ) {
         var querystring = '{"name": "'  + this.state.currentRecipeName + '", "ratings":"' + newRating +'"}';
-        console.log(querystring);
+        // console.log(querystring);
         var dictionary = this.state.ratedDictionary;
-        console.log("FUCKEN LOVE ASS = " + dictionary[this.state.currentRecipeName])
         if(dictionary[this.state.currentRecipeName]){
             //This user already rated this drink
             this.setState({
@@ -227,9 +221,6 @@ class Items extends Component {
                     console.log("Connection Established", response);
                 }
             }).then((req)=>{
-                console.log(req)
-                console.log(req['count'])
-                console.log(req['rating'])
                 var avg = req['rating']/req['count'];
                 avg = avg.toFixed(2);
                 $('#avg').text(avg)
@@ -445,13 +436,13 @@ class Items extends Component {
         }
         else{
             this.setState({
-                items: [],
+                // items: [],
                 homeVisibility: true,
                 recipesVisibility: false,
                 individualVisibility: false,
                 activeTab: "home",
                 message: "",
-                shoppingList: []
+                // shoppingList: []
             })
             $('#home').text("The Mixologist")
         }
@@ -478,12 +469,12 @@ class Items extends Component {
         }
         else{
             this.setState({
-                items: [],
+                // items: [],
                 homeVisibility: false,
                 recipesVisibility: true,
                 individualVisibility: false,
                 activeTab: "recipes",
-                shoppingList: []
+                // shoppingList: []
             })
         }
     }
@@ -519,9 +510,7 @@ class Items extends Component {
                 var drink = this.state.currentRecipeName;
                 var itemList = this.state.items;
                 var length = itemList.length;
-
-                console.log(itemList);
-                // console.log(recipeJson[drink])
+                
                 for(var i = 0; i < 15; i++)
                 {
                     var currItem = recipeJson[drink][i];
@@ -533,25 +522,30 @@ class Items extends Component {
                         {
                             if(itemList[j] === currItem)
                             {
-                                console.log(currItem + "exist in the list")
+                                // console.log(currItem + "exist in the list")
                                 inList = true; 
                             }
                         }
                         if(!inList)
                         {
-                            console.log(currItem + "item does not exist. Adding.....")
-                            // shoppingList = [...shoppingList, <div>{currItem}</div>]
-                            this.state.shoppingList = [...this.state.shoppingList, <div>{currItem}</div>]
+                            // console.log(currItem + "item does not exist. Adding.....")
+                            this.state.shoppingList = [...this.state.shoppingList, <div>-{currItem}</div>]
                         }
                     }
                 }
-                return this.state.shoppingList;
+                return(
+                    <div className="text-danger">
+                        <b>
+                            {(this.state.shoppingList.length !== 0) ? <div className="text-danger">Additional ingredients required!!!</div> : <div className="text-success">You have ALL the ingredients!!! Make it and rate it!!!</div>}
+                            {this.state.shoppingList}
+                        </b>
+                    </div>
+                ) 
 
             }
         }
     }
 
-    // <div>{this.shoppingList()}</div>
 
     render() {
         return(
@@ -562,6 +556,7 @@ class Items extends Component {
                 <div>{this.loadingScreen()}</div>
                 <div>{this.loadIndividual()}</div>
                 <div>{this.displayRating()}</div>
+                <div>{this.shoppingList()}</div>
             </div>
         )
     }
