@@ -26,9 +26,11 @@ brew upgrade node
 ## Running the Application
 
 1) Start the flask server by navigating to Server.py in the src directory of the-mixologist.
+2) Start the google authentication by navigating to The_Mixologist-Key.json in the the_mixologist.
 
 ```
-export FLASK_APP=Server.py
+export FLASK_APP=path/to/Server.py
+export GOOGLE_APPLICATION_CREDENTIALS=path/to/The_Mixologist-Key.json
 flask run
 ```
 
