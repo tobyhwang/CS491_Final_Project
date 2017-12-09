@@ -28,6 +28,13 @@
 .App-intro {
   font-size: large;
 }
+.left{
+  float:left center;
+}
+.right{
+  float:right center;
+}
+
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }

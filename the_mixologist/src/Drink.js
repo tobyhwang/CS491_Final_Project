@@ -20,7 +20,7 @@ class Drink extends Component {
         //On Click the function expandInfo will get called upon calling the parent component function
         return(
             <div>
-                <ListGroupItem tag="a" onClick={this.expandInfo} >{this.props.name}<Badge className="App-right" pill>{this.props.recipes[this.props.name][33]}</Badge></ListGroupItem>
+                <ListGroupItem tag="a" onClick={this.expandInfo} ><div className = "text-left"><div>{this.props.name}</div><Badge pill>{this.props.recipes[this.props.name][33]} missing ingredients</Badge></div></ListGroupItem>
             </div>
         )
     }
