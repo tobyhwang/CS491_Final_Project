@@ -6,6 +6,7 @@ This project focuses on creating a web application using an ensemble of web tech
 
 As discussed with Professor Kanich, we will not be handling reviews as previously stated in the proposal due to the fact that we are not creating any type of login profiles.  Instead we will allow the user to rate each drink only once per browsing session.  So a user can't review a drink more than once in a session.  It does take some time for the application to pull the list of drinks, but if there is significant lag (or anything of that nature), just refersh the url.
 
+
 ### Prerequisites & Installing
 
 1) Make sure that you have at least Python 3.6 installed on your computer and install Flask
@@ -57,7 +58,6 @@ npm start
 3) Tequila  n=2
 4) Armaretto, coke  n=3
 5) Vodka, rum  n=2
-
 
 ## Built With
 
