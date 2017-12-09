@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Drink from './Drink'
-
+import './App.css';
 // var drinks = "";
 class Recipes extends Component {
     constructor(props){

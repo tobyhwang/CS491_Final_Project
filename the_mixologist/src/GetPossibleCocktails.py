@@ -77,6 +77,7 @@ def n_drinks(ingredients, drinks, n):
             if item in ingredients or item == '':
                 matched += 1
         if matched >= 15 - n:
+            v.append(15 - matched)
             n_eligible[k] = v
 
     return n_eligible

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ListGroupItem } from 'reactstrap';
+import { ListGroupItem, Badge } from 'reactstrap';
 
 class Drink extends Component {
 
@@ -13,10 +13,11 @@ class Drink extends Component {
         fn(this.props.name);
     }
 
+    
     render() {
         return(
             <div>
-                <ListGroupItem tag="a" onClick={this.expandInfo}>{this.props.name}</ListGroupItem>
+                <ListGroupItem tag="a" onClick={this.expandInfo} >{this.props.name}<Badge className="App-right" pill>{this.props.recipes[this.props.name][33]}</Badge></ListGroupItem>
             </div>
         )
     }
