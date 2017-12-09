@@ -103,6 +103,7 @@ def setRatings(drink_name,new_rating):
         # Prepares the new entity
         task = datastore.Entity(key=task_key)
         print(res['name'])
+        print(type(new_rating))
         task.update({
             'name' : res['name'],
             'instructions' : res['instructions'],
@@ -136,9 +137,8 @@ def getRatings(drink_name):
 
     for res in result:
 
-        avg_rating = int(res['rating'])/int(res['count'])
-
-    return avg_rating
+        rating = {'rating': res['rating'], 'count': res['count']}
+    return rating
 
 # ingredients = ['Light rum', 'Ginger beer', 'Lemon peel']
 # ingredients = [x.lower() for x in ingredients]
@@ -197,14 +197,16 @@ def get_ratings_endpoint():
     return jsonify(rating)
 
 # set ratings
-@app.route('/set_ratings',methods = ["Post"])
-def set_ratings__endpoint():
+@app.route('/setratings',methods = ["Post"])
+def setratings__endpoint():
     drink = request.get_json(force=True)
     name = drink['name']
-    rating = drink['ratings']
+    rating = int(drink['ratings'])
+    print(name)
+    print(rating)
     setRatings(name, rating)
 
-    return getRatings(name)
+    return jsonify(getRatings(name))
 
 
 
