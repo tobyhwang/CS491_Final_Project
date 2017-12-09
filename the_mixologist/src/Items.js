@@ -186,6 +186,30 @@ class Items extends Component {
 
     changeRating( newRating ) {
         console.log("I LOVE ASS = " + newRating);
+        console.log("MY NAME IS " + this.state.currentRecipeName)
+        
+        // var querystring = '{"ingredients":["'  + itemString + '"], "n":' + n +'}';
+        var querystring = '{"name": "'  + this.state.currentRecipeName + '", "ratings":"' + newRating +'"}';
+        console.log(querystring);
+        $.ajax({
+            url: "http://localhost:5000/setratings",
+            type: "POST",
+            data: querystring,
+            dataType: "json",
+            success: function(response) {
+                return response;
+            },
+            error: function(response) {
+                console.log("Connection Problem", response);
+            },
+
+            complete: function(response) {
+                console.log("Connection Established", response);
+            }
+        }).then((req)=>{
+            console.log(req)    
+        })
+        
         this.setState({
           rating: newRating
         });
@@ -210,6 +234,7 @@ class Items extends Component {
             (recipes[name][13] !== '') && <div key="14">{recipes[name][28]}{recipes[name][13]}</div>,
             (recipes[name][14] !== '') && <div key="15">{recipes[name][29]}{recipes[name][14]}</div>,
             (recipes[name][30] !== '') && <div key="16">Instruction: {recipes[name][30]}</div>,
+            <div> rating = {recipes[name][31]} count = {recipes[name][32]}</div>,
             <Rating rating={recipes[name][32]/recipes[name][31]}
                 isSelectable={true}
                 isAggregateRating={true}
@@ -222,7 +247,8 @@ class Items extends Component {
                 individualVisibility : true,
                 recipesVisibility : false,
                 homeVisibility : false,
-                activeTab : "current"
+                activeTab : "current",
+                currentRecipeName : name
             })
             this.setState({
                 navtab : <NavItem><NavLink className={ this.state.activeTab === "current" ? "active" : "link"} onClick={this.loadNav}>{name}</NavLink></NavItem>
@@ -240,7 +266,6 @@ class Items extends Component {
             if(this.state.recipesVisibility && Object.keys(recipes).length !== 0){
                 for(var drink in recipes)
                 {
-                    this.state.currentRecipeName = drink;
                     html = [...html, <Drink key = {i} name = {drink} recipes = {this.state.recipeJSON} onClick = {this.expandRecipe}/>]
                     i++;
                 }
