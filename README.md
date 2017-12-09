@@ -4,7 +4,8 @@ This project focuses on creating a web application using an ensemble of web tech
 
 ### Notes to the Grader
 
-As discussed with Professor Kanich, we will not be handling reviews as previously stated in the proposal due to the fact that we are not creating any type of login profiles.  Instead we will allow the user to rate each drink only once per browsing session.  So a user can't review a drink more than once in a session.  Loading time for drinks will take a little bit of time, but if there is noticable lag (or anything else related), just refresh the url.
+As discussed with Professor Kanich, we will not be handling reviews as previously stated in the proposal due to the fact that we are not creating any type of login profiles.  Instead we will allow the user to rate each drink only once per browsing session.  So a user can't review a drink more than once in a session.  It does take some time for the application to pull the list of drinks, but if there is significant lag (or anything of that nature), just refersh the url.
+
 
 ### Prerequisites & Installing
 
@@ -34,9 +35,10 @@ flask run
 
 2) Run the React Application by navigating to the-mixologist directory.
 
-'''
-npm install && npm run
-'''
+```
+npm install
+npm start
+```
 
 ## Walkthough
 
