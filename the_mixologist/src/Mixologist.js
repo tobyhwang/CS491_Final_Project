@@ -511,7 +511,6 @@ class Mixologist extends Component {
         {
             if(this.state.recipeJSON && (this.state.currentRecipeName !== '') && (this.state.items !== []))
             {
-                var shoppingList = this.state.shoppingList;
                 var recipeJson = this.state.recipeJSON;
                 var drink = this.state.currentRecipeName;
                 var itemList = this.state.items;
