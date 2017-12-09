@@ -17,8 +17,8 @@ for item in ingredients['drinks']:
     possible_ingredients.append(item['strIngredient1'])
 
 possible_drinks = []
-# get all the possible drink combinations
 
+# get all the possible drink combinations
 with open('drinks.txt', 'w') as out:
     for ingredient in possible_ingredients:
         drinks = requests.get('http://www.thecocktaildb.com/api/json/v1/1/filter.php?i=' + ingredient)

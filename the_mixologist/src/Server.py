@@ -9,10 +9,11 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# create the client for datastore
 def create_client(project_id):
     return datastore.Client(project_id)
 
-
+# get all the elgible drinks from the ingredients
 def elgible_drinks(ingredients, query):
 
     drinks = {}
@@ -47,7 +48,7 @@ def elgible_drinks(ingredients, query):
 
     return drinks
 
-
+# return back all the drinks that exactly matches the input ingredients
 def exact_drinks(ingredients, drinks):
 
     elgible = {}
@@ -67,10 +68,12 @@ def exact_drinks(ingredients, drinks):
 
     return elgible
 
+# return all the drinks that are n or less away
 def n_drinks(ingredients, drinks, n):
     
     n_eligible = {}
     
+    # loop through each drink and find a match
     for k,v in drinks.items():
         matched = 0
         for item in v[0:15]:
@@ -79,9 +82,11 @@ def n_drinks(ingredients, drinks, n):
         if matched >= 15 - n:
             v.append(15 - matched)
             n_eligible[k] = v
-
+    
+    # return the drinks
     return n_eligible
 
+# set the ratings for each drink
 def setRatings(drink_name,new_rating):
 
     # Instantiates a client
@@ -93,11 +98,9 @@ def setRatings(drink_name,new_rating):
     query.add_filter('name', '=', drink_name)
     result = query.fetch()
 
-
+    # update datastore
     for res in result:
 
-        # The name/ID for the new entity
-        # name = 'vodka'
         # The Cloud Datastore key for the new entity
         task_key = datastore_client.key('Recipe', res.key.name)
 
@@ -125,6 +128,7 @@ def setRatings(drink_name,new_rating):
         # Saves the entity
         datastore_client.put(task)
 
+# Function returns each rating
 def getRatings(drink_name):
 
     # Instantiates a client
@@ -136,18 +140,11 @@ def getRatings(drink_name):
     query.add_filter('name', '=', drink_name)
     result = query.fetch()
 
+    # get the attributes of the rating results
     for res in result:
-
         rating = {'rating': res['rating'], 'count': res['count']}
+
     return rating
-
-# ingredients = ['Light rum', 'Ginger beer', 'Lemon peel']
-# ingredients = [x.lower() for x in ingredients]
-# print(ingredients)
-# drinks = elgible_drinks(ingredients, query)
-
-# print('exact: ' + str(exact_drinks(ingredients, drinks)))
-# print('n: ' + str(n_drinks(ingredients, drinks, 1)))
 
 #route returns exact drinks
 @app.route('/exact',methods = ["POST"])
@@ -156,7 +153,6 @@ def exact_endpoint():
     query = client.query(kind='Recipe')
     ingredients = request.get_json(force=True)['ingredients']
     ingredients = [x.lower() for x in ingredients]
-    print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     exact = exact_drinks(ingredients, drinks)
     return jsonify(exact)
@@ -169,13 +165,9 @@ def naway_endpoint():
     req = request.get_json(force=True)
     ingredients = req['ingredients']
     n = req['n']
-    # name = req['name'][0]
-    # rating = getRatings(name)
     ingredients = [x.lower() for x in ingredients]
-    print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     n_output = n_drinks(ingredients, drinks, n)
-    print(n_output)
     return jsonify(n_output)
 
 
@@ -186,7 +178,6 @@ def search_endpoint():
     query = client.query(kind='Recipe')
     ingredients = request.get_json(force=True)['ingredients']
     ingredients = [x.lower() for x in ingredients]
-    print(ingredients)
     drinks = elgible_drinks(ingredients, query)
     return jsonify(drinks)
 
@@ -203,20 +194,8 @@ def setratings__endpoint():
     drink = request.get_json(force=True)
     name = drink['name']
     rating = int(drink['ratings'])
-    print(name)
-    print(rating)
     setRatings(name, rating)
-
     return jsonify(getRatings(name))
-
-
-
-# def main():
-#     "Start gevent WSGI server"
-#     # use gevent WSGI server instead of the Flask
-#     http = WSGIServer(('', 5000), app.wsgi_app)
-#     # TODO gracefully handle shutdown
-#     http.serve_forever()
 
 if __name__ == '__main__':
     app.run(threaded=True)
